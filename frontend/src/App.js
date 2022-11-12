@@ -4,6 +4,7 @@ import React from 'react';
 // test fiels
 const ALList = [
   {
+    pk: 1,
     activity: "Do the cleaning",
     description: "Clean the living room and bed room",
     is_compeleted: true,
@@ -11,6 +12,7 @@ const ALList = [
     priority: 'list-group-item-light',
   },
   {
+    pk: 2,
     activity: "Study CS 1023",
     description: "Prepare for the mid term",
     is_compeleted: false,
@@ -18,6 +20,7 @@ const ALList = [
     priority: 'list-group-item-danger',
   },
   {
+    pk: 3,
     activity: "Study MATH 4233",
     description: "Finish first chapter and do the after chapter problems",
     is_compeleted: false,
@@ -25,6 +28,7 @@ const ALList = [
     priority: 'list-group-item-warning',
   },
   {
+    pk: 4,
     activity: "Finish ARTS 342 Assignment 4",
     description: "",
     is_compeleted: false,
@@ -39,6 +43,19 @@ class List extends React.Component {
     this.state = {
       logs: ALList,
     };
+  }
+
+  clickComplete(pk) {
+    console.log('clicked');
+    const list = this.state.logs.slice();
+    list.forEach((item) => {
+      if (item.pk === pk)
+        item.is_compeleted = ! item.is_compeleted;
+    });
+
+    this.setState({
+      logs: list,
+    });
   }
 
   renderLogs(is_compeleted) {
@@ -56,6 +73,7 @@ class List extends React.Component {
             type="checkbox"
             value=""
             defaultChecked={is_compeleted}
+            onChange={() => this.clickComplete(log.pk)}
           ></input>
           <div class="ms-2 me-auto">
             <div class="fw-bold">{log.activity}</div>
@@ -68,13 +86,13 @@ class List extends React.Component {
   render() {
     return (
       <body>
-        <div class="container">
-          <h2 class="my-4"> Activity Logs </h2>
+        <div class="container-fluid">
           <div class="row">
-            <div class="col-md-7 col-sm-10 mx-auto p-0">
-              <ul class="list-group">{this.renderLogs(false)}</ul>
+          <h2 class="my-4"> Activity Logs </h2>
+            <div class="col-md-7 col-sm-10 p-0">
+              <ul class="list-group ml-4">{this.renderLogs(false)}</ul>
             </div>
-            <div class="col-md-4 col-sm-10 mx-auto p-0">
+            <div class="col-md-4 col-sm-6 mx-auto p-0">
               <h3>completed </h3>
               <ul class="list-group">{this.renderLogs(true)}</ul>
             </div>
