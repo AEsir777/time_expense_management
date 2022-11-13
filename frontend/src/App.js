@@ -1,5 +1,7 @@
 import './App.css';
 import React from 'react';
+/* import Modal from './modal'; */
+import Modal from './modal'
 
 // test fiels
 const ALList = [
@@ -37,20 +39,37 @@ const ALList = [
   },
 ];
 
+const newAL = {
+  pk: 0,
+  activity: "",
+  description: "",
+  is_compeleted: false,
+  due_time: "",
+  priority: "list-group-item-danger",
+};
+
 class List extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       logs: ALList,
+      modal_on: false,
+      modal_log: newAL,
     };
   }
 
+  clickLog(log) {
+    console.log('model should be opened')
+    this.setState({ modal_on: true, modal_log: log });
+    console.log(this.state.modal_on)
+    console.log(this.state.modal_log)
+  }
+
   clickComplete(pk) {
-    console.log('clicked');
+    console.log("clicked");
     const list = this.state.logs.slice();
     list.forEach((item) => {
-      if (item.pk === pk)
-        item.is_compeleted = ! item.is_compeleted;
+      if (item.pk === pk) item.is_compeleted = !item.is_compeleted;
     });
 
     this.setState({
@@ -59,14 +78,17 @@ class List extends React.Component {
   }
 
   renderLogs(is_compeleted) {
-    const completed = this.state.logs.filter((log) =>
-      log.is_compeleted === is_compeleted,
+    const completed = this.state.logs.filter(
+      (log) => log.is_compeleted === is_compeleted
     );
 
     return completed.map((log) => {
       return (
         <li
           class={`list-group-item d-flex justify-content-between align-item-start list-group-item-action ${log.priority}`}
+          onClick={() => this.clickLog(log)}
+          data-bs-toggle="modal"
+          data-bs-target="#dropdown"
         >
           <input
             class="form-check-input me-1"
@@ -88,7 +110,7 @@ class List extends React.Component {
       <body>
         <div class="container-fluid">
           <div class="row">
-          <h2 class="my-4"> Activity Logs </h2>
+            <h2 class="my-4"> Activity Logs </h2>
             <div class="col-md-7 col-sm-10 p-0">
               <ul class="list-group ml-4">{this.renderLogs(false)}</ul>
             </div>
@@ -98,6 +120,26 @@ class List extends React.Component {
             </div>
           </div>
         </div>
+        <Modal
+          log={this.state.modal_log}
+          id="dropdown"
+          save={() => this.save()}
+          delete={() => this.delete()}
+        />
+
+        {this.state.modal_on ? (
+          <div>
+            <button
+              class="tg-primary"
+              onClick={() => {
+                console.log("test");
+              }}
+            ></button>
+            <Modal
+              log={this.state.modal_log}
+            />
+          </div>
+        ) : null}
       </body>
     );
   }
