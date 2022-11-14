@@ -1,7 +1,6 @@
 import './App.css';
 import React from 'react';
-/* import Modal from './modal'; */
-import Modal from './modal'
+import Modal from './modal';
 
 // test fiels
 const ALList = [
@@ -53,16 +52,15 @@ class List extends React.Component {
     super(props);
     this.state = {
       logs: ALList,
-      modal_on: false,
       modal_log: newAL,
     };
   }
 
   clickLog(log) {
     console.log('model should be opened')
-    this.setState({ modal_on: true, modal_log: log });
-    console.log(this.state.modal_on)
-    console.log(this.state.modal_log)
+    this.setState({ modal_on: true, modal_log: log }, () => {
+      console.log(this.state.modal_log);
+    });
   }
 
   clickComplete(pk) {
@@ -77,6 +75,30 @@ class List extends React.Component {
     });
   }
 
+  delete(pk) {
+    console.log('delete log ' + pk);
+    const list = this.state.logs.filter( (item) => item.pk !== pk );
+    this.setState({
+      logs: list,
+    });
+  }
+
+  save(pk, activity, description, due_time, priority) {
+    console.log('save log ' + pk);
+    const list = this.state.logs.filter( (item) => item.pk !== pk );
+    list.forEach((item) => {
+      if (item.pk === pk) {
+        item.activity = activity;
+        item.description = description;
+        item.due_time = due_time;
+        item.priority = priority;
+      }
+    });
+    this.setState({
+      logs: list,
+    });
+  }
+
   renderLogs(is_compeleted) {
     const completed = this.state.logs.filter(
       (log) => log.is_compeleted === is_compeleted
@@ -86,9 +108,7 @@ class List extends React.Component {
       return (
         <li
           class={`list-group-item d-flex justify-content-between align-item-start list-group-item-action ${log.priority}`}
-          onClick={() => this.clickLog(log)}
-          data-bs-toggle="modal"
-          data-bs-target="#dropdown"
+          key={log.pk}
         >
           <input
             class="form-check-input me-1"
@@ -97,7 +117,12 @@ class List extends React.Component {
             defaultChecked={is_compeleted}
             onChange={() => this.clickComplete(log.pk)}
           ></input>
-          <div class="ms-2 me-auto">
+          <div
+            class="ms-2 me-auto"
+            onClick={() => this.clickLog(log)}
+            data-bs-toggle="modal"
+            data-bs-target="#edit_panel"
+          >
             <div class="fw-bold">{log.activity}</div>
           </div>
         </li>
@@ -107,7 +132,7 @@ class List extends React.Component {
 
   render() {
     return (
-      <body>
+      <div>
         <div class="container-fluid">
           <div class="row">
             <h2 class="my-4"> Activity Logs </h2>
@@ -120,27 +145,17 @@ class List extends React.Component {
             </div>
           </div>
         </div>
-        <Modal
-          log={this.state.modal_log}
-          id="dropdown"
-          save={() => this.save()}
-          delete={() => this.delete()}
-        />
 
-        {this.state.modal_on ? (
-          <div>
-            <button
-              class="tg-primary"
-              onClick={() => {
-                console.log("test");
-              }}
-            ></button>
-            <Modal
-              log={this.state.modal_log}
-            />
-          </div>
-        ) : null}
-      </body>
+        <div>
+          <Modal
+            {...this.state.modal_log}
+            onDelete={(pk) => this.delete(pk)}
+            onSave={(pk, activity, description, due_time, priority) =>
+              this.save(pk, activity, description, due_time, priority)
+            }
+          />
+        </div>
+      </div>
     );
   }
 }

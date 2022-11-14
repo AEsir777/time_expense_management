@@ -1,24 +1,43 @@
 import React from "react";
+import * as bootstrap from 'bootstrap';
+window.Modal = bootstrap.Modal;
 
 class Modal extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      log: this.props.log,
+      pk: this.props.pk,
+      activity: this.props.activity,
+      due_time: this.props.due_time,
+      priority: this.props.priority,
     };
+  } 
+
+  handleChange(event) {
+    console.log(event.target.value);
+    console.log(event.target.name);
+    switch(event.target.name) {
+      case "activity":
+        this.setState({ activity: event.target.value }); 
+        break;
+      case "description":
+        this.setState({ description: event.target.value }); 
+        break;
+      case "due_time":
+        this.setState({ due_time: event.target.value }); 
+        break;
+      default:
+        break;
+    }
   }
 
   render() {
     return (
-      <div
-        class="modal fade" tabIndex="-1"
-      >
+      <div class="modal fade" tabIndex="-1" id="edit_panel">
         <div class="modal-dialog">
           <div class="modal-content">
             <div class="modal-header">
-              <h1 class="modal-title fs-5" id="exampleModalLabel">
-                Activity Log
-              </h1>
+              <h1 class="modal-title fs-5">Activity Log</h1>
               <button
                 type="button"
                 class="btn-close"
@@ -28,39 +47,48 @@ class Modal extends React.Component {
             </div>
             <div class="modal-body">
               <form>
-                <div class="mb-3">
+                <div class="mb-3 form-group">
                   {/* activity  */}
                   <label class="form-label">Activity</label>
                   <input
                     type="text"
+                    name="activity"
                     class="form-control"
-                    value={this.state.log.activity}
-                    onChange={() => {console.log('field modified');}}
+                    value={this.props.activity}
+                    onChange={(e) => {
+                      this.handleChange(e);
+                    }}
                     placeholder="Please enter the activity"
                   />
                 </div>
-                <div class="mb-3">
+                <div class="mb-3 form-group">
                   {/* description  */}
                   <label class="form-label">Description</label>
                   <input
                     class="form-control"
-                    value={this.state.log.description}
-                    onChange={() => {console.log('field modified');}}
+                    name="description"
+                    value={this.props.description}
+                    onChange={(e) => {
+                      this.handleChange(e);
+                    }}
                     placeholder="Please enter the description"
                   ></input>
                 </div>
-                <div class="mb-3">
+                <div class="mb-3 form-group">
                   {/* due time  */}
                   <label class="form-label">Due time</label>
                   <input
                     class="form-control"
-                    value={this.state.log.due_time}
-                    onChange={() => {console.log('field modified');}}
+                    name="due_time"
+                    value={this.props.due_time}
+                    onChange={(e) => {
+                      this.handleChange(e);
+                    }}
                     placeholder="2022 January 01 00:00"
                   ></input>
                 </div>
 
-{/*                 <div class="mb-3">
+                {/*                 <div class="mb-3">
                     priority 
                   <select
                     class="form-select form-select-lg mb-3"
@@ -78,7 +106,10 @@ class Modal extends React.Component {
               <button
                 type="button"
                 class="btn btn-danger"
-                onClick={() => {console.log('delete is clicked');}}
+                onClick={() => {
+                  this.props.onDelete(this.props.pk);
+                }}
+                data-bs-dismiss="modal"
               >
                 Delete
               </button>
@@ -92,7 +123,15 @@ class Modal extends React.Component {
               <button
                 type="button"
                 class="btn btn-primary"
-                onClick={() => {console.log('save is clicked');}}
+                onClick={() => {
+                  this.props.onSave(
+                    this.state.pk,
+                    this.state.description,
+                    this.state.due_time,
+                    this.state.priority
+                  );
+                }}
+                data-bs-dismiss="modal"
               >
                 Save changes
               </button>
