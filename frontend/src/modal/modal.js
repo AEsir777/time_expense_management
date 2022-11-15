@@ -81,7 +81,7 @@ export default function Modal(props){
                 type="button"
                 class="btn btn-danger"
                 onClick={() => {
-                  props.onDelete(props.log.pk);
+                  props.onDelete(props.log.id);
                 }}
                 data-bs-dismiss="modal"
               >

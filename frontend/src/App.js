@@ -2,45 +2,10 @@ import './App.css';
 import React from 'react';
 import Modal from './modal/modal';
 import AddModal from './modal/addModal';
-
-// test fiels
-const ALList = [
-  {
-    pk: 1,
-    activity: "Do the cleaning",
-    description: "Clean the living room and bed room",
-    is_compeleted: true,
-    due_time: '2022 October 11 19:00',
-    priority: 'list-group-item-light',
-  },
-  {
-    pk: 2,
-    activity: "Study CS 1023",
-    description: "Prepare for the mid term",
-    is_compeleted: false,
-    due_time: '2022 October 23 12:00',
-    priority: 'list-group-item-danger',
-  },
-  {
-    pk: 3,
-    activity: "Study MATH 4233",
-    description: "Finish first chapter and do the after chapter problems",
-    is_compeleted: false,
-    due_time: '2022 October 24 14:00',
-    priority: 'list-group-item-warning',
-  },
-  {
-    pk: 4,
-    activity: "Finish ARTS 342 Assignment 4",
-    description: "",
-    is_compeleted: false,
-    due_time: '2022 October 29 19:00',
-    priority: 'list-group-item-danger',
-  },
-];
+import axios, * as others from 'axios';
 
 const newAL = {
-  pk: 0,
+  id: 0,
   activity: "",
   description: "",
   is_compeleted: false,
@@ -52,9 +17,19 @@ class List extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      logs: ALList,
+      logs: [],
       modal_log: newAL,
     };
+  }
+
+  getList() {
+    axios.get("api/").then((results) => {
+      this.setState({ logs: results.data })
+    }).catch((err) => { console.log(err) });
+  }
+
+  componentDidMount() {
+    this.getList();
   }
 
   clickLog(log) {
@@ -62,33 +37,55 @@ class List extends React.Component {
     return;
   }
 
-  clickComplete(pk) {
-    console.log("clicked");
-    const list = this.state.logs.slice();
+  clickComplete(id) {
+    console.log("clicked" + id);
+    let list = this.state.logs.slice();
     list.forEach((item) => {
-      if (item.pk === pk) item.is_compeleted = !item.is_compeleted;
+      if (item.id === id) {
+        item.is_compeleted = !item.is_compeleted;
+        this.save(item);
+        return;
+      } 
     });
 
-    this.setState({
-      logs: list,
-    });
   }
 
-  delete(pk) {
-    console.log("delete log " + pk);
+  delete(id) {
+    axios.delete(`api/${id}/`).then(() => {
+      this.getList();
+    });
+    /* console.log("delete log " + id);
     const list = this.state.logs.filter((item) => item.pk !== pk);
     this.setState({
       logs: list,
-    });
+    }); */
   }
 
-  save(newLog, add=false) {
-    let list = this.state.logs.slice();
+  save(newLog) {
+    const log = {
+      activity: newLog.activity,
+      description: newLog.description,
+      is_compeleted: newLog.is_compeleted,
+      due_time: newLog.due_time,
+      priority: newLog.priority,
+    };
+    if ( newLog.id ) {
+      axios.put(`api/${newLog.id}/`, log).then(() => {
+        this.getList();
+      });
+      return;
+    }
+    axios
+      .post("api/new/", log)
+      .then(() => {
+        this.getList();
+      });
+/*     let list = this.state.logs.slice();
     if ( add ) {
       list.push(newLog);
     } else {
       list.forEach((item, index) => {
-        if (item.pk === newLog.pk) {
+        if (item.id === newLog.id) {
           list[index] = newLog;
           return;
         }
@@ -97,7 +94,7 @@ class List extends React.Component {
  
     this.setState({
       logs: list,
-    });
+    }); */
   }
 
   handleChange(event) {
@@ -118,14 +115,14 @@ class List extends React.Component {
       return (
         <li
           class={`list-group-item d-flex justify-content-between align-item-start list-group-item-action ${log.priority}`}
-          key={log.pk}
+          key={log.id}
         >
           <input
             class="form-check-input me-1"
             type="checkbox"
             value=""
             defaultChecked={is_compeleted}
-            onChange={() => this.clickComplete(log.pk)}
+            onChange={() => this.clickComplete(log.id)}
           ></input>
           <div
             class="ms-2 me-auto"
@@ -168,13 +165,13 @@ class List extends React.Component {
         <div>
           <Modal
             log={modal_log}
-            onDelete={(pk) => this.delete(pk)}
+            onDelete={(id) => this.delete(id)}
             onSave={(log) => this.save(log)}
             onChange={(event) => this.handleChange(event)}
           />
           <AddModal
             log={modal_log}
-            onSave={(log) => this.save(log, true)}
+            onSave={(log) => this.save(log)}
             onChange={(event) => this.handleChange(event)}
           />
         </div>
