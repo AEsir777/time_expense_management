@@ -1,6 +1,7 @@
 import './App.css';
 import React from 'react';
-import Modal from './modal';
+import Modal from './modal/modal';
+import AddModal from './modal/addModal';
 
 // test fiels
 const ALList = [
@@ -57,10 +58,8 @@ class List extends React.Component {
   }
 
   clickLog(log) {
-    console.log('model should be opened')
-    this.setState({ modal_on: true, modal_log: log }, () => {
-      console.log(this.state.modal_log);
-    });
+    this.setState({ modal_log: log });
+    return;
   }
 
   clickComplete(pk) {
@@ -76,27 +75,38 @@ class List extends React.Component {
   }
 
   delete(pk) {
-    console.log('delete log ' + pk);
-    const list = this.state.logs.filter( (item) => item.pk !== pk );
+    console.log("delete log " + pk);
+    const list = this.state.logs.filter((item) => item.pk !== pk);
     this.setState({
       logs: list,
     });
   }
 
-  save(pk, activity, description, due_time, priority) {
-    console.log('save log ' + pk);
-    const list = this.state.logs.filter( (item) => item.pk !== pk );
-    list.forEach((item) => {
-      if (item.pk === pk) {
-        item.activity = activity;
-        item.description = description;
-        item.due_time = due_time;
-        item.priority = priority;
-      }
-    });
+  save(newLog, add=false) {
+    let list = this.state.logs.slice();
+    if ( add ) {
+      list.push(newLog);
+    } else {
+      list.forEach((item, index) => {
+        if (item.pk === newLog.pk) {
+          list[index] = newLog;
+          return;
+        }
+      });
+    }
+ 
     this.setState({
       logs: list,
     });
+  }
+
+  handleChange(event) {
+    const log = {
+      ...this.state.modal_log,
+      [event.target.name]: event.target.value,
+    };
+
+    this.setState({ modal_log: log });
   }
 
   renderLogs(is_compeleted) {
@@ -131,6 +141,7 @@ class List extends React.Component {
   }
 
   render() {
+    const modal_log = this.state.modal_log;
     return (
       <div>
         <div class="container-fluid">
@@ -138,6 +149,14 @@ class List extends React.Component {
             <h2 class="my-4"> Activity Logs </h2>
             <div class="col-md-7 col-sm-10 p-0">
               <ul class="list-group ml-4">{this.renderLogs(false)}</ul>
+              <button
+                class="btn btn-primary"
+                data-bs-toggle="modal"
+                onClick={() => this.clickLog(newAL)}
+                data-bs-target="#add_panel"
+              >
+                Create
+              </button>
             </div>
             <div class="col-md-4 col-sm-6 mx-auto p-0">
               <h3>completed </h3>
@@ -148,11 +167,15 @@ class List extends React.Component {
 
         <div>
           <Modal
-            {...this.state.modal_log}
+            log={modal_log}
             onDelete={(pk) => this.delete(pk)}
-            onSave={(pk, activity, description, due_time, priority) =>
-              this.save(pk, activity, description, due_time, priority)
-            }
+            onSave={(log) => this.save(log)}
+            onChange={(event) => this.handleChange(event)}
+          />
+          <AddModal
+            log={modal_log}
+            onSave={(log) => this.save(log, true)}
+            onChange={(event) => this.handleChange(event)}
           />
         </div>
       </div>
