@@ -8,9 +8,9 @@ class ActivitiyLog(models.Model):
     due_time = models.DateTimeField(blank=True)
     
     class PriotyLevel(models.TextChoices):
-        LOW = 'low', 'green'
-        MEDIUM = 'medium','yellow'
-        HIGH = 'high', 'red'
-    priority = models.CharField(max_length=6, choices=PriotyLevel.choices, default=PriotyLevel.MEDIUM)
+        LOW = 'list-group-item-light', 'low'
+        MEDIUM = 'list-group-item-warning', 'medium'
+        HIGH = 'list-group-item-danger', 'high'
+    priority = models.CharField(max_length=23, choices=PriotyLevel.choices, default=PriotyLevel.MEDIUM)
 
 
