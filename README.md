@@ -10,3 +10,7 @@
    ![image](https://user-images.githubusercontent.com/77596290/202338037-940a9ea8-91c4-448c-a44e-d425f28a48d0.png)
    ![image](https://user-images.githubusercontent.com/77596290/202338086-932a6c60-5ffc-432a-8f43-5b84b76e8ca3.png)
 
+- connect django to MongoDB using djongo
+  ![image](https://user-images.githubusercontent.com/77596290/203218262-5d96fd36-9167-4f9a-b6cf-f74e00ec4c9b.png)
+  ![image](https://user-images.githubusercontent.com/77596290/203218299-3b703442-783b-4ce2-96e7-ae9439bcfa6b.png)
+
